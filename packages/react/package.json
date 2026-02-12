@@ -1,6 +1,6 @@
 {
   "name": "@smooth-player/react",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "React component for Smooth Player",
   "type": "module",
   "main": "./dist/index.js",
