@@ -1,6 +1,6 @@
 {
   "name": "@smooth-player/svelte",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Svelte component for Smooth Player",
   "type": "module",
   "main": "./src/index.js",
