@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>smooth-player demo</title>
+    <link rel="stylesheet" href="/dist/smooth-player.css" />
+    <link rel="stylesheet" href="/examples/demo.css" />
+  </head>
+  <body>
+    <section id="player-root" class="smooth-player">
+      <div class="smooth-player__main">
+        <div class="smooth-player__top">
+          <div class="smooth-player__top-title">My playlist</div>
+          <button id="shuffle-toggle" type="button" aria-label="Attiva shuffle" aria-pressed="false" hidden>
+            <span class="smooth-player__icon-shuffle" aria-hidden="true"></span>
+            <span id="shuffle-text" class="smooth-player__sr-only">Attiva shuffle</span>
+          </button>
+        </div>
+
+        <div class="smooth-player__hero">
+          <div id="progress-ring" class="smooth-player__ring">
+            <div class="smooth-player__ring-inner">
+              <div class="smooth-player__cover">
+                <canvas id="radial-visualizer" class="smooth-player__cover-canvas" width="320" height="320"></canvas>
+              </div>
+            </div>
+          </div>
+          <button id="play" class="smooth-player__hero-play" type="button" aria-label="Riproduci" aria-pressed="false">
+            <span id="play-icon" class="smooth-player__icon-play" aria-hidden="true"></span>
+            <span id="play-text" class="smooth-player__sr-only">Riproduci</span>
+          </button>
+        </div>
+
+        <div class="smooth-player__meta">
+          <strong id="title">-</strong>
+          <div id="artist" class="smooth-player__artist">-</div>
+        </div>
+
+        <div class="smooth-player__progress-wrap">
+          <input id="progress" class="smooth-player__progress" type="range" min="0" max="0" step="0.01" value="0" aria-label="Posizione brano" />
+          <div class="smooth-player__progress-row">
+            <span id="time-current">00:00</span>
+            <span id="time-duration">00:00</span>
+          </div>
+        </div>
+
+        <div class="smooth-player__transport">
+          <button id="prev" class="secondary" type="button" aria-label="Brano precedente">
+            <img class="smooth-player__icon" src="../assets/icons/prev.svg" alt="" />
+            <span class="smooth-player__sr-only">Brano precedente</span>
+          </button>
+          <button id="playlist-toggle" class="secondary smooth-player__transport-playlist" type="button" aria-label="Apri playlist" aria-expanded="false" hidden>
+            <img class="smooth-player__icon" src="../assets/icons/menu.svg" alt="" />
+            <span class="smooth-player__sr-only">Apri playlist</span>
+          </button>
+          <button id="next" class="secondary" type="button" aria-label="Brano successivo">
+            <img class="smooth-player__icon" src="../assets/icons/next.svg" alt="" />
+            <span class="smooth-player__sr-only">Brano successivo</span>
+          </button>
+        </div>
+
+      </div>
+
+      <aside id="playlist-panel" class="smooth-player__playlist" aria-hidden="true">
+        <div class="smooth-player__playlist-head">
+          <h2>Playlist</h2>
+          <button id="playlist-close" class="smooth-player__playlist-close secondary" type="button" aria-label="Chiudi playlist">
+            <span aria-hidden="true">&times;</span>
+            <span class="smooth-player__sr-only">Chiudi playlist</span>
+          </button>
+        </div>
+        <ul id="playlist-list" class="smooth-player__playlist-list" role="listbox" aria-label="Lista brani"></ul>
+      </aside>
+    </section>
+
+    <section id="debug-panel" class="demo-debug" aria-live="polite" hidden>
+      <h3>Audio Debug</h3>
+      <div class="demo-debug__grid">
+        <div>src: <code id="dbg-src">-</code></div>
+        <div>currentTime: <code id="dbg-current-time">-</code></div>
+        <div>duration: <code id="dbg-duration">-</code></div>
+        <div>readyState: <code id="dbg-ready-state">-</code></div>
+        <div>networkState: <code id="dbg-network-state">-</code></div>
+        <div>paused: <code id="dbg-paused">-</code></div>
+      </div>
+      <pre id="dbg-events" class="demo-debug__events"></pre>
+    </section>
+
+    <script type="module" src="/examples/demo.js"></script>
+  </body>
+</html>
