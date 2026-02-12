@@ -1,0 +1,17 @@
+{
+  "name": "@smooth-player/react",
+  "version": "0.1.0",
+  "description": "React wrapper components for Smooth Player",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "scripts": {
+    "build": "echo \"TODO: add React package build\"",
+    "typecheck": "echo \"TODO: add React package typecheck\""
+  }
+}
