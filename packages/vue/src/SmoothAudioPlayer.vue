@@ -7,10 +7,10 @@ import {
   type AudioTrack,
   type VisualizerMode,
 } from "smooth-player";
-import prevIcon from "smooth-player/assets/icons/prev.svg";
-import nextIcon from "smooth-player/assets/icons/next.svg";
-import playIcon from "smooth-player/assets/icons/play.svg";
-import pauseIcon from "smooth-player/assets/icons/pause.svg";
+import prevIcon from "./assets/prev.svg";
+import nextIcon from "./assets/next.svg";
+import playIcon from "./assets/play.svg";
+import pauseIcon from "./assets/pause.svg";
 
 const props = withDefaults(defineProps<{
   tracks: AudioTrack[];
