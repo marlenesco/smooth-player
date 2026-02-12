@@ -1,0 +1,45 @@
+{
+  "name": "smooth-player",
+  "version": "0.1.0",
+  "description": "Typed audio player with spectrum and waveform analyzers",
+  "type": "module",
+  "main": "./dist-cjs/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "dist-cjs",
+    "styles",
+    "assets"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist dist-cjs",
+    "build:esm": "tsc -p tsconfig.build.esm.json",
+    "build:cjs": "tsc -p tsconfig.build.cjs.json",
+    "build:types": "tsc -p tsconfig.build.json",
+    "build:css": "sass --no-source-map styles/index.scss dist/smooth-player.css",
+    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:types && npm run build:css",
+    "dev": "tsc -p tsconfig.build.esm.json --watch",
+    "typecheck": "tsc --noEmit",
+    "demo": "npm run build && node scripts/demo-server.mjs"
+  },
+  "keywords": [
+    "audio-player",
+    "typescript",
+    "spectrum-analyzer",
+    "waveform",
+    "web-audio"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "sass": "^1.93.2",
+    "typescript": "^5.7.3"
+  }
+}
