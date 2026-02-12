@@ -198,3 +198,14 @@ npm run demo
 Open:
 
 - `http://127.0.0.1:4173/examples/demo.html`
+
+## Media Attribution and CORS
+
+Audio tracks included in this repository are provided for demonstration purposes only.
+
+- Part of the demo media is sourced from [Pixabay](https://pixabay.com/).
+- Additional demo files are SoundHelix songs available in `examples/audio`.
+
+If you load audio from external hosts, those sources must be CORS-enabled for browser playback and analysis features.
+The media server should return a valid `Access-Control-Allow-Origin` header for your application origin (or `*` when appropriate).
+Without proper CORS headers, browsers may block playback and prevent analyzer/visualizer processing.
