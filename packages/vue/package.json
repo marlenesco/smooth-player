@@ -1,6 +1,6 @@
 {
   "name": "@smooth-player/vue",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Vue component for Smooth Player",
   "type": "module",
   "main": "./src/index.js",

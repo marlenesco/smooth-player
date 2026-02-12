@@ -1,6 +1,6 @@
 {
   "name": "smooth-player",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Typed audio player with spectrum and waveform analyzers",
   "type": "module",
   "workspaces": [
@@ -53,6 +53,14 @@
     "web-audio"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marlenesco/smooth-player"
+  },
+  "homepage": "https://github.com/marlenesco/smooth-player",
+  "bugs": {
+    "url": "https://github.com/marlenesco/smooth-player/issues"
+  },
   "devDependencies": {
     "sass": "^1.93.2",
     "typescript": "^5.7.3"
