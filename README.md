@@ -1,19 +1,19 @@
 # Smooth Player
 
-A TypeScript audio player for the web with:
+Smooth Player is a TypeScript audio player for the web with built-in playlist handling, visualizers, accent-based styling, and reusable UI mount helpers.
 
-- single track or playlist playback
-- visualizer modes (`spectrum`, `waveform`, `none`)
-- draggable circular progress ring (demo UI)
-- configurable accent color
-- ESM + CJS + type definitions output
+## Features
 
-Playlist behavior notes:
-
-- `mode` is no longer required
-- with 1 track, it behaves like a single-track player
-- with multiple tracks, it automatically advances when playback ends (if `loop` is disabled)
-- the active playlist title is shown automatically in the player top area
+- Single track and playlist playback
+- Nested playlists (`AudioPlaylist` inside `PlaylistEntry`)
+- Automatic playlist behavior:
+  - If there is only one track, playlist controls stay hidden
+  - If there are multiple tracks, next/previous + playlist panel are available
+- Visualizer modes: `spectrum`, `waveform`, `none`
+- Circular draggable progress ring support
+- Configurable `accentColor` through player config
+- Built-in debug panel support
+- Typed API (`.d.ts`) with ESM + CJS builds
 
 ## Install
 
@@ -21,26 +21,92 @@ Playlist behavior notes:
 npm install smooth-player
 ```
 
-## Basic usage
+## Quick Start
 
 ```ts
-import { SmoothPlayer } from "smooth-player";
+import { SmoothPlayer, mountStandardPlayerUI } from "smooth-player";
+import "smooth-player/dist/smooth-player.css";
+
+const tracks = [
+  {
+    id: "song-1",
+    src: "/audio/song-1.mp3",
+    metadata: { title: "Song 1", artist: "Artist 1" },
+  },
+  {
+    id: "song-2",
+    src: "/audio/song-2.mp3",
+    metadata: { title: "Song 2", artist: "Artist 2" },
+  },
+];
 
 const player = new SmoothPlayer({
+  playlist: tracks,
   initialVolume: 0.8,
   visualizer: "spectrum",
   accentColor: "#0ed2a4",
   debug: false,
-  playlist: [
-    { id: "1", src: "/audio/song-1.mp3", metadata: { title: "Song 1", artist: "Artist" } },
-  ],
 });
 
-player.setAccentColor("#ff7a59");
-await player.play();
+const root = document.querySelector("#player-root");
+if (!(root instanceof HTMLElement)) throw new Error("Missing #player-root");
+
+mountStandardPlayerUI(player, root);
 ```
 
-## Nested playlists
+## Core Config (`SmoothPlayerOptions`)
+
+- `playlist?: PlaylistEntry[]`
+- `visualizer?: "spectrum" | "waveform" | "none"` (default: `"spectrum"`)
+- `accentColor?: string` (default: `#0ed2a4`)
+- `debug?: boolean` (default: `false`)
+- `initialVolume?: number`
+- `initialTrackIndex?: number`
+- `initialShuffle?: boolean`
+- `autoplay?: boolean`
+- `loop?: boolean`
+- `durationFallback?: boolean` (default: `true`, fallback decode for unknown metadata duration)
+- `analyzer?: { fftSize, smoothingTimeConstant, minDecibels, maxDecibels }`
+
+## Visualizer
+
+At runtime:
+
+```ts
+player.setVisualizer("waveform");
+const current = player.getVisualizer(); // "waveform"
+```
+
+Raw data API:
+
+- `getSpectrumData()`
+- `getWaveformData()`
+
+Exported visualizer classes:
+
+- `CanvasRadialVisualizer`
+- `CanvasSpectrumVisualizer`
+- `CanvasWaveformVisualizer`
+
+## Debug
+
+Enable debug directly in config:
+
+```ts
+const player = new SmoothPlayer({
+  playlist: tracks,
+  debug: true,
+});
+```
+
+Use `mountDebugPanel(...)` to bind debug metrics to your elements, or call `mountStandardPlayerUI(player, root, { debugEnabled: true })` when your DOM includes the debug panel nodes.
+
+Runtime methods:
+
+- `setDebug(enabled: boolean)`
+- `getDebug()`
+
+## Playlists (including nested)
 
 ```ts
 const playlist = [
@@ -52,9 +118,7 @@ const playlist = [
       {
         id: "focus-deep",
         title: "Focus Deep",
-        tracks: [
-          { id: "fd-1", src: "/audio/focus-deep-1.mp3", metadata: { title: "Deep 1" } },
-        ],
+        tracks: [{ id: "fd-1", src: "/audio/focus-deep-1.mp3", metadata: { title: "Deep 1" } }],
       },
     ],
   },
@@ -66,26 +130,53 @@ const playlist = [
 ];
 
 const player = new SmoothPlayer({ playlist });
+player.selectPlaylist("chill");
 ```
 
-Accent methods:
+Playlist API highlights:
 
-- `setAccentColor(color)`
-- `getAccentColor()`
-- `applyAccentColor(targetElement)`
+- `setPlaylist(entries, startIndex?)`
+- `getPlaylists()`
+- `getCurrentPlaylist()`
+- `selectPlaylist(playlistId, startIndex?)`
 
-Native playlist/player UI helpers (optional):
+## Events
 
-- `mountPlaylist(container, options?)`
+Subscribe with `player.on(eventName, handler)`:
+
+- `ready`
+- `play`
+- `pause`
+- `ended`
+- `playlistchange`
+- `trackchange`
+- `durationchange`
+- `timeupdate`
+- `volumechange`
+- `error`
+
+## UI Mount Helpers
+
+- `mountStandardPlayerUI(player, root, options?)`
 - `mountTrackInfo(titleElement, artistElement, options?)`
 - `mountPlayButton(buttonElement, options?)`
 - `mountProgress(options)`
 - `mountTransportControls(options)`
 - `mountShuffleToggle(options)`
 - `mountPlaylistPanel(options)`
+- `mountPlaylistSwitcher(container, options?)`
+- `mountPlaylist(container, options?)`
+- `mountPlaylistTitle(element, options?)`
 - `mountDebugPanel(options)`
-- `mountStandardPlayerUI(player, root, options?)`
+
+## Utility Methods
+
+- `setAccentColor(color)`
+- `getAccentColor()`
+- `applyAccentColor(targetElement)`
 - `formatTime(seconds)`
+- `getState()`
+- `getAudioElement()`
 
 ## Scripts
 
@@ -95,7 +186,7 @@ Native playlist/player UI helpers (optional):
 - `npm run typecheck`
 - `npm run demo`
 
-## Local demo
+## Local Demo
 
 ```bash
 npm install
@@ -105,4 +196,3 @@ npm run demo
 Open:
 
 - `http://127.0.0.1:4173/examples/demo.html`
-- debug: `http://127.0.0.1:4173/examples/demo.html?debug=1`
