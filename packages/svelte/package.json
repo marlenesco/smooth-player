@@ -1,0 +1,16 @@
+{
+  "name": "@smooth-player/svelte",
+  "version": "0.1.0",
+  "description": "Svelte wrapper components for Smooth Player",
+  "type": "module",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "peerDependencies": {
+    "svelte": ">=4"
+  },
+  "scripts": {
+    "build": "echo \"TODO: add Svelte package build\"",
+    "typecheck": "echo \"TODO: add Svelte package typecheck\""
+  }
+}

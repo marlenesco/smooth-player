@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Typed audio player with spectrum and waveform analyzers",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "./dist-cjs/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -28,7 +31,9 @@
     "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:types && npm run build:css",
     "dev": "tsc -p tsconfig.build.esm.json --watch",
     "typecheck": "tsc --noEmit",
-    "demo": "npm run build && node scripts/demo-server.mjs"
+    "demo": "npm run build && node scripts/demo-server.mjs",
+    "workspaces:build": "npm run -ws --if-present build",
+    "workspaces:typecheck": "npm run -ws --if-present typecheck"
   },
   "keywords": [
     "audio-player",
