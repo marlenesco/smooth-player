@@ -1,6 +1,6 @@
 {
   "name": "smooth-player",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Typed audio player with spectrum and waveform analyzers",
   "type": "module",
   "workspaces": [

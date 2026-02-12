@@ -1,6 +1,6 @@
 {
   "name": "@smooth-player/react",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "React wrapper components for Smooth Player",
   "type": "module",
   "private": true,
