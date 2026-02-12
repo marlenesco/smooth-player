@@ -21,6 +21,8 @@ Smooth Player is a TypeScript audio player for the web with built-in playlist ha
 npm install smooth-player
 ```
 
+![Smooth Player screenshot](examples/screenshot/example.png)
+
 ## Quick Start
 
 ```ts
