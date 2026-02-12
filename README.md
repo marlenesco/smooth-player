@@ -1,19 +1,19 @@
-# smooth-player
+# Smooth Player
 
-Audio player TypeScript per web con:
+A TypeScript audio player for the web with:
 
-- traccia singola o playlist
-- visualizer (`spectrum`, `waveform`, `none`)
-- progress circolare drag-to-seek (demo)
-- accent color configurabile
-- output ESM + CJS + types
+- single track or playlist playback
+- visualizer modes (`spectrum`, `waveform`, `none`)
+- draggable circular progress ring (demo UI)
+- configurable accent color
+- ESM + CJS + type definitions output
 
-Nota comportamento playlist:
+Playlist behavior notes:
 
-- `mode` non serve piu
-- con 1 traccia il player si comporta come singolo
-- con piu tracce avanza automaticamente al brano successivo a fine riproduzione (se `loop` non e attivo)
-- il titolo playlist corrente viene mostrato automaticamente nel player (top title)
+- `mode` is no longer required
+- with 1 track, it behaves like a single-track player
+- with multiple tracks, it automatically advances when playback ends (if `loop` is disabled)
+- the active playlist title is shown automatically in the player top area
 
 ## Install
 
@@ -21,7 +21,7 @@ Nota comportamento playlist:
 npm install smooth-player
 ```
 
-## Uso base
+## Basic usage
 
 ```ts
 import { SmoothPlayer } from "smooth-player";
@@ -40,7 +40,7 @@ player.setAccentColor("#ff7a59");
 await player.play();
 ```
 
-## Playlist annidate
+## Nested playlists
 
 ```ts
 const playlist = [
@@ -68,13 +68,13 @@ const playlist = [
 const player = new SmoothPlayer({ playlist });
 ```
 
-Metodi accent:
+Accent methods:
 
 - `setAccentColor(color)`
 - `getAccentColor()`
 - `applyAccentColor(targetElement)`
 
-Playlist UI nativa (opzionale):
+Native playlist/player UI helpers (optional):
 
 - `mountPlaylist(container, options?)`
 - `mountTrackInfo(titleElement, artistElement, options?)`
@@ -95,14 +95,14 @@ Playlist UI nativa (opzionale):
 - `npm run typecheck`
 - `npm run demo`
 
-## Demo locale
+## Local demo
 
 ```bash
 npm install
 npm run demo
 ```
 
-Apri:
+Open:
 
 - `http://127.0.0.1:4173/examples/demo.html`
 - debug: `http://127.0.0.1:4173/examples/demo.html?debug=1`
