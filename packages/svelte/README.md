@@ -11,9 +11,24 @@ npm install smooth-player @smooth-player/svelte
 ## Usage
 
 ```svelte
-<script>
+<script lang="ts">
   import "smooth-player/dist/smooth-player.css";
   import { SmoothAudioPlayer } from "@smooth-player/svelte";
+  import type { PlaylistEntry } from "smooth-player";
+
+  const tracks: PlaylistEntry[] = [
+    {
+      id: "demo",
+      title: "Demo Playlist",
+      tracks: [
+        {
+          id: "song-1",
+          src: "https://cdn.pixabay.com/audio/2020/08/17/audio_613575b827.mp3",
+          metadata: { title: "Robot Gypsy Jazz", artist: "Frank Vanga" },
+        },
+      ],
+    },
+  ];
 </script>
 
 <SmoothAudioPlayer

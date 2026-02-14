@@ -13,15 +13,34 @@ npm install smooth-player @smooth-player/react
 ```tsx
 import "smooth-player/dist/smooth-player.css";
 import { SmoothAudioPlayer } from "@smooth-player/react";
+import type { PlaylistEntry } from "smooth-player";
 
-<SmoothAudioPlayer
-  tracks={tracks}
-  accentColor="#0ed2a4"
-  backgroundColor="#0b1220"
-  visualizer="spectrum"
-  initialVolume={0.8}
-  uiOptions={{ showLogo: true }}
-/>;
+const tracks: PlaylistEntry[] = [
+  {
+    id: "demo",
+    title: "Demo Playlist",
+    tracks: [
+      {
+        id: "song-1",
+        src: "https://cdn.pixabay.com/audio/2020/08/17/audio_613575b827.mp3",
+        metadata: { title: "Robot Gypsy Jazz", artist: "Frank Vanga" },
+      },
+    ],
+  },
+];
+
+export function App() {
+  return (
+    <SmoothAudioPlayer
+      tracks={tracks}
+      accentColor="#0ed2a4"
+      backgroundColor="#0b1220"
+      visualizer="spectrum"
+      initialVolume={0.8}
+      uiOptions={{ showLogo: true }}
+    />
+  );
+}
 ```
 
 ## Component props
