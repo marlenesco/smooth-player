@@ -1,106 +1,73 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, computed, watch } from "vue";
+import { onBeforeUnmount, ref, watch } from "vue";
 import {
   SmoothPlayer,
-  CanvasSpectrumVisualizer,
-  CanvasWaveformVisualizer,
-  type AudioTrack,
+  mountPlayerUI,
+  type PlaylistEntry,
+  type SmoothPlayerOptions,
+  type StandardPlayerUIMountOptions,
   type VisualizerMode,
 } from "smooth-player";
 
 const props = withDefaults(defineProps<{
-  tracks: AudioTrack[];
+  tracks: PlaylistEntry[];
   accentColor?: string;
+  backgroundColor?: string;
   visualizer?: VisualizerMode;
   initialVolume?: number;
+  playerOptions?: Omit<SmoothPlayerOptions, "playlist" | "accentColor" | "backgroundColor" | "visualizer" | "initialVolume">;
+  uiOptions?: StandardPlayerUIMountOptions;
 }>(), {
   accentColor: "#0ed2a4",
+  backgroundColor: "#0b1220",
   visualizer: "spectrum",
   initialVolume: 0.8,
 });
 
 const rootRef = ref<HTMLElement | null>(null);
-const spectrumRef = ref<HTMLCanvasElement | null>(null);
-const waveformRef = ref<HTMLCanvasElement | null>(null);
-const player = ref<SmoothPlayer | null>(null);
-const currentIndex = ref(0);
-const isPlaying = ref(false);
+let player: SmoothPlayer | null = null;
+let destroyUI: (() => void) | null = null;
 
-const currentTrack = computed(() => props.tracks[currentIndex.value] ?? null);
+const teardown = () => {
+  destroyUI?.();
+  destroyUI = null;
+  player?.destroy();
+  player = null;
+};
 
-let spectrum: CanvasSpectrumVisualizer | null = null;
-let waveform: CanvasWaveformVisualizer | null = null;
-
-onMounted(() => {
-  const instance = new SmoothPlayer({
-    initialVolume: props.initialVolume,
-    visualizer: props.visualizer,
+watch(
+  () => ({
+    root: rootRef.value,
+    tracks: props.tracks,
     accentColor: props.accentColor,
-  });
-  instance.setPlaylist(props.tracks, 0);
-  player.value = instance;
-
-  if (props.visualizer === "spectrum") {
-    spectrum = new CanvasSpectrumVisualizer(spectrumRef.value!, instance, { color: "#3cc8d9" });
-    spectrum.start();
-  }
-
-  if (props.visualizer === "waveform") {
-    waveform = new CanvasWaveformVisualizer(waveformRef.value!, instance, { color: "#e7f0ff" });
-    waveform.start();
-  }
-
-  instance.on("trackchange", ({ index }) => (currentIndex.value = index));
-  instance.on("play", () => (isPlaying.value = true));
-  instance.on("pause", () => (isPlaying.value = false));
-
-  applyAccent();
-});
+    backgroundColor: props.backgroundColor,
+    visualizer: props.visualizer,
+    initialVolume: props.initialVolume,
+    playerOptions: props.playerOptions,
+    uiOptions: props.uiOptions,
+  }),
+  () => {
+    if (!rootRef.value) return;
+    teardown();
+    player = new SmoothPlayer({
+      ...props.playerOptions,
+      accentColor: props.accentColor,
+      backgroundColor: props.backgroundColor,
+      visualizer: props.visualizer,
+      initialVolume: props.initialVolume,
+      playlist: props.tracks,
+    });
+    const ui = mountPlayerUI(player, rootRef.value, props.uiOptions);
+    destroyUI = () => ui.destroy();
+  },
+  { immediate: true, deep: true },
+);
 
 onBeforeUnmount(() => {
-  spectrum?.stop();
-  waveform?.stop();
-  player.value?.destroy();
+  teardown();
 });
-
-watch(() => props.accentColor, () => applyAccent());
-
-function applyAccent() {
-  if (!player.value || !rootRef.value) return;
-  player.value.setAccentColor(props.accentColor);
-  player.value.applyAccentColor(rootRef.value);
-}
-
-async function toggle() {
-  await player.value?.toggle();
-}
 </script>
 
 <template>
-  <section ref="rootRef" class="smooth-player">
-    <div class="smooth-player__main">
-      <div class="smooth-player__row">
-        <h2 class="smooth-player__title">Smooth Player</h2>
-        <div class="smooth-player__controls">
-          <button class="secondary" @click="player?.previous()" aria-label="Previous">
-            <img class="smooth-player__icon" src="/assets/icons/prev.svg" alt="" />
-          </button>
-          <button @click="toggle" :aria-label="isPlaying ? 'Pause' : 'Play'">
-            <img class="smooth-player__icon" :src="isPlaying ? '/assets/icons/pause.svg' : '/assets/icons/play.svg'" alt="" />
-          </button>
-          <button class="secondary" @click="player?.next()" aria-label="Next">
-            <img class="smooth-player__icon" src="/assets/icons/next.svg" alt="" />
-          </button>
-        </div>
-      </div>
-
-      <div class="smooth-player__meta">
-        <strong>{{ currentTrack?.metadata?.title ?? "Unknown title" }}</strong>
-        <div class="smooth-player__artist">{{ currentTrack?.metadata?.artist ?? "Unknown artist" }}</div>
-      </div>
-
-      <canvas ref="spectrumRef" id="spectrum" class="smooth-player__canvas" width="860" height="180" :hidden="props.visualizer !== 'spectrum'"></canvas>
-      <canvas ref="waveformRef" id="waveform" class="smooth-player__canvas" width="860" height="120" :hidden="props.visualizer !== 'waveform'"></canvas>
-    </div>
-  </section>
+  <section ref="rootRef"></section>
 </template>

@@ -4,6 +4,7 @@ import {
   type AudioPlaylist,
   type AudioTrack,
   type DebugPanelMountOptions,
+  type AudioDropMountOptions,
   type PlaylistEntry,
   type PlaylistMountOptions,
   type PlaylistPanelController,
@@ -15,11 +16,14 @@ import {
   type PlaybackState,
   type PlayerEvents,
   type SmoothPlayerOptions,
+  type SpectrumStyleOptions,
   type ShuffleToggleMountOptions,
   type TrackInfoMountOptions,
   type TransportControlsMountOptions,
   type VisualizerMode,
+  type WaveformStyleOptions,
 } from "./types.js";
+import { strings } from "./i18n/strings.js";
 
 interface ResolvedPlaylist {
   id: string;
@@ -35,8 +39,19 @@ const DEFAULT_ANALYZER: Required<AnalyzerOptions> = {
 };
 
 const DEFAULT_ACCENT_COLOR = "#0ed2a4";
-const DEFAULT_PLAYLIST_ID = "default";
-const DEFAULT_PLAYLIST_TITLE = "My playlist";
+const DEFAULT_BACKGROUND_COLOR = "#0b1220";
+const DEFAULT_PLAYLIST_ID = strings.playlist.defaultId;
+const DEFAULT_PLAYLIST_TITLE = strings.playlist.defaultTitle;
+const DEFAULT_SPECTRUM_STYLE: SpectrumStyleOptions = {
+  dualLayer: false,
+  inverted: false,
+  barWidth: "medium",
+};
+const DEFAULT_WAVEFORM_STYLE: WaveformStyleOptions = {
+  doubleLine: false,
+  fill: false,
+  thickLine: false,
+};
 
 export class SmoothPlayer {
   private readonly audio: HTMLAudioElement;
@@ -49,7 +64,10 @@ export class SmoothPlayer {
   private activePlaylistId: string | null = null;
   private currentTrackIndex = -1;
   private visualizerMode: VisualizerMode;
+  private spectrumStyle: SpectrumStyleOptions;
+  private waveformStyle: WaveformStyleOptions;
   private accentColor: string;
+  private backgroundColor: string;
   private shuffleEnabled: boolean;
   private debugEnabled: boolean;
   private durationFallbackEnabled: boolean;
@@ -70,7 +88,10 @@ export class SmoothPlayer {
     this.audio.volume = this.clamp(options.initialVolume ?? 1);
 
     this.visualizerMode = options.visualizer ?? "spectrum";
+    this.spectrumStyle = { ...DEFAULT_SPECTRUM_STYLE, ...options.spectrumStyle };
+    this.waveformStyle = { ...DEFAULT_WAVEFORM_STYLE, ...options.waveformStyle };
     this.accentColor = options.accentColor ?? DEFAULT_ACCENT_COLOR;
+    this.backgroundColor = options.backgroundColor ?? DEFAULT_BACKGROUND_COLOR;
     this.shuffleEnabled = options.initialShuffle ?? false;
     this.debugEnabled = options.debug ?? false;
     this.durationFallbackEnabled = options.durationFallback ?? true;
@@ -115,6 +136,35 @@ export class SmoothPlayer {
 
   applyAccentColor(target: HTMLElement): void {
     target.style.setProperty("--smooth-player-accent", this.accentColor);
+  }
+
+  setBackgroundColor(color: string): void {
+    this.backgroundColor = color;
+  }
+
+  getBackgroundColor(): string {
+    return this.backgroundColor;
+  }
+
+  applyBackgroundColor(target: HTMLElement): void {
+    const normalized = this.backgroundColor.trim().toLowerCase();
+    if (normalized === DEFAULT_BACKGROUND_COLOR) {
+      target.style.removeProperty("--smooth-player-background");
+      target.style.removeProperty("--smooth-player-surface");
+      target.style.removeProperty("--smooth-player-panel");
+      target.style.removeProperty("--smooth-player-muted");
+      return;
+    }
+
+    target.style.setProperty("--smooth-player-background", this.backgroundColor);
+    target.style.setProperty("--smooth-player-surface", this.buildSurfaceGradient(this.backgroundColor));
+    target.style.setProperty("--smooth-player-panel", this.buildPanelGradient(this.backgroundColor));
+    target.style.setProperty("--smooth-player-muted", `color-mix(in srgb, ${this.backgroundColor} 30%, #d2deef 70%)`);
+  }
+
+  applyTheme(target: HTMLElement): void {
+    this.applyAccentColor(target);
+    this.applyBackgroundColor(target);
   }
 
   setShuffle(enabled: boolean): void {
@@ -222,8 +272,8 @@ export class SmoothPlayer {
       titleClassName: options.titleClassName ?? "smooth-player__playlist-title",
       artistClassName: options.artistClassName ?? "smooth-player__playlist-artist",
       selectedAriaAttr: options.selectedAriaAttr ?? "aria-current",
-      getTitle: options.getTitle ?? ((track, index) => track.metadata?.title ?? `Track ${index + 1}`),
-      getArtist: options.getArtist ?? ((track) => track.metadata?.artist ?? "Unknown artist"),
+      getTitle: options.getTitle ?? ((track, index) => track.metadata?.title ?? `${strings.track.unknownTitle} ${index + 1}`),
+      getArtist: options.getArtist ?? ((track) => track.metadata?.artist ?? strings.track.unknownArtist),
     };
     const onSelect = options.onSelect;
 
@@ -311,7 +361,7 @@ export class SmoothPlayer {
       trigger.className = "smooth-player__playlist-switcher-trigger";
       trigger.setAttribute("aria-haspopup", "listbox");
       trigger.setAttribute("aria-expanded", String(isOpen));
-      trigger.textContent = currentPlaylist?.title ?? playlists[0]?.title ?? "Playlist";
+      trigger.textContent = currentPlaylist?.title ?? playlists[0]?.title ?? strings.playlist.triggerLabel;
 
       const menu = doc.createElement("div");
       menu.className = "smooth-player__playlist-switcher-menu";
@@ -391,8 +441,8 @@ export class SmoothPlayer {
     artistElement: HTMLElement,
     options: TrackInfoMountOptions = {},
   ): () => void {
-    const unknownTitle = options.unknownTitle ?? "Unknown title";
-    const unknownArtist = options.unknownArtist ?? "Unknown artist";
+    const unknownTitle = options.unknownTitle ?? strings.track.unknownTitle;
+    const unknownArtist = options.unknownArtist ?? strings.track.unknownArtist;
 
     const render = (): void => {
       const track = this.getCurrentTrack();
@@ -407,8 +457,8 @@ export class SmoothPlayer {
 
   mountPlayButton(button: HTMLButtonElement, options: PlayButtonMountOptions = {}): () => void {
     const labelElement = options.labelElement ?? null;
-    const playLabel = options.playLabel ?? "Riproduci";
-    const pauseLabel = options.pauseLabel ?? "Pausa";
+    const playLabel = options.playLabel ?? strings.playback.playLabel;
+    const pauseLabel = options.pauseLabel ?? strings.playback.pauseLabel;
 
     const render = (): void => {
       const isPlaying = !this.audio.paused;
@@ -455,8 +505,8 @@ export class SmoothPlayer {
       button,
       labelElement = null,
       activeClassName = "smooth-player__toggle-on",
-      enabledLabel = "Disattiva shuffle",
-      disabledLabel = "Attiva shuffle",
+      enabledLabel = strings.shuffle.enabledLabel,
+      disabledLabel = strings.shuffle.disabledLabel,
       initialEnabled = false,
     } = options;
 
@@ -492,8 +542,8 @@ export class SmoothPlayer {
       panel,
       closeButton = null,
       openClassName = "smooth-player--playlist-open",
-      openLabel = "Apri playlist",
-      closeLabel = "Chiudi playlist",
+      openLabel = strings.playlist.openLabel,
+      closeLabel = strings.playlist.closeLabel,
     } = options;
 
     let isOpen = false;
@@ -505,18 +555,33 @@ export class SmoothPlayer {
     };
 
     const setOpen = (open: boolean): void => {
+      const activeElement = (root.ownerDocument ?? document).activeElement;
+      const focusedInsidePanel = activeElement instanceof Node && panel.contains(activeElement);
+
       if (!hasPlaylist()) {
         isOpen = false;
+        if (focusedInsidePanel) {
+          toggleButton.focus();
+        }
         root.classList.remove(openClassName);
         panel.setAttribute("aria-hidden", "true");
+        panel.setAttribute("inert", "");
         toggleButton.setAttribute("aria-expanded", "false");
         toggleButton.setAttribute("aria-label", openLabel);
         return;
       }
 
       isOpen = open;
+      if (!open && focusedInsidePanel) {
+        toggleButton.focus();
+      }
       root.classList.toggle(openClassName, open);
       panel.setAttribute("aria-hidden", String(!open));
+      if (open) {
+        panel.removeAttribute("inert");
+      } else {
+        panel.setAttribute("inert", "");
+      }
       toggleButton.setAttribute("aria-expanded", String(open));
       toggleButton.setAttribute("aria-label", open ? closeLabel : openLabel);
     };
@@ -749,13 +814,220 @@ export class SmoothPlayer {
     };
   }
 
+  mountAudioDrop(target: HTMLElement, options: AudioDropMountOptions = {}): () => void {
+    const activeClassName = options.activeClassName ?? "is-drag-over";
+    const onDropCallback = options.onDrop;
+    let dragDepth = 0;
+    let activeObjectUrls: string[] = [];
+
+    const clearActiveState = (): void => {
+      dragDepth = 0;
+      target.classList.remove(activeClassName);
+    };
+
+    const revokeActiveUrls = (): void => {
+      for (const url of activeObjectUrls) {
+        URL.revokeObjectURL(url);
+      }
+      activeObjectUrls = [];
+    };
+
+    const isAudioFile = (file: File): boolean => {
+      if (file.type.startsWith("audio/")) return true;
+      return /\.(mp3|wav|ogg|m4a|aac|flac|opus)$/i.test(file.name);
+    };
+
+    const isPlaylistFile = (file: File): boolean => {
+      if (/\.m3u8?$/i.test(file.name)) return true;
+      return /(?:application|audio)\/(?:vnd\.apple\.mpegurl|x-mpegurl)/i.test(file.type);
+    };
+
+    const baseName = (value: string): string => {
+      const noQuery = value.split("?")[0]?.split("#")[0] ?? value;
+      const normalized = noQuery.replace(/\\/g, "/");
+      const tail = normalized.split("/").pop() ?? normalized;
+      try {
+        return decodeURIComponent(tail);
+      } catch {
+        return tail;
+      }
+    };
+
+    const guessTitle = (value: string): string => baseName(value).replace(/\.[^/.]+$/, "") || strings.track.unknownTitle;
+
+    const buildTrackFromAudioFile = (file: File, index: number): AudioTrack => {
+      const src = URL.createObjectURL(file);
+      activeObjectUrls.push(src);
+
+      const track: AudioTrack = {
+        id: `dropped-${Date.now()}-${index}`,
+        src,
+        metadata: {
+          title: file.name.replace(/\.[^/.]+$/, ""),
+          artist: strings.track.localFileArtist,
+        },
+      };
+      if (file.type) {
+        track.type = file.type;
+      }
+      return track;
+    };
+
+    const parseM3U = (content: string, localAudioFiles: File[]): AudioTrack[] => {
+      const localByName = new Map<string, File>();
+      localAudioFiles.forEach((file) => {
+        localByName.set(file.name.toLowerCase(), file);
+      });
+
+      const tracks: AudioTrack[] = [];
+      const lines = content.split(/\r?\n/);
+      let extInfTitle: string | null = null;
+
+      lines.forEach((raw, index) => {
+        const line = raw.trim().replace(/^\uFEFF/, "");
+        if (!line) return;
+
+        if (line.startsWith("#EXTINF:")) {
+          const commaIndex = line.indexOf(",");
+          extInfTitle = commaIndex >= 0 ? line.slice(commaIndex + 1).trim() : null;
+          return;
+        }
+
+        if (line.startsWith("#")) return;
+
+        const localFile = localByName.get(baseName(line).toLowerCase()) ?? null;
+        let src = "";
+        let type: string | undefined;
+
+        if (localFile) {
+          src = URL.createObjectURL(localFile);
+          activeObjectUrls.push(src);
+          type = localFile.type || undefined;
+        } else {
+          try {
+            src = new URL(line, window.location.href).href;
+          } catch {
+            src = "";
+          }
+        }
+
+        if (!src) {
+          extInfTitle = null;
+          return;
+        }
+
+        const track: AudioTrack = {
+          id: `dropped-m3u-${Date.now()}-${index}`,
+          src,
+          metadata: {
+            title: extInfTitle || guessTitle(line),
+            artist: localFile ? strings.track.localFileArtist : strings.track.m3uArtist,
+          },
+        };
+        if (type) {
+          track.type = type;
+        }
+        tracks.push(track);
+        extInfTitle = null;
+      });
+
+      return tracks;
+    };
+
+    const hasFilePayload = (event: DragEvent): boolean => {
+      const types = event.dataTransfer?.types;
+      if (!types) return false;
+      return Array.from(types).includes("Files");
+    };
+
+    const onDragEnter = (event: DragEvent): void => {
+      if (!hasFilePayload(event)) return;
+      event.preventDefault();
+      dragDepth += 1;
+      target.classList.add(activeClassName);
+    };
+
+    const onDragOver = (event: DragEvent): void => {
+      if (!hasFilePayload(event)) return;
+      event.preventDefault();
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "copy";
+      }
+    };
+
+    const onDragLeave = (event: DragEvent): void => {
+      if (!hasFilePayload(event)) return;
+      event.preventDefault();
+      dragDepth = Math.max(0, dragDepth - 1);
+      if (dragDepth === 0) {
+        target.classList.remove(activeClassName);
+      }
+    };
+
+    const onDropEvent = async (event: DragEvent): Promise<void> => {
+      event.preventDefault();
+      clearActiveState();
+
+      const files = Array.from(event.dataTransfer?.files ?? []);
+      if (!files.length) return;
+
+      const playlistFile = files.find(isPlaylistFile) ?? null;
+      const audioFiles = files.filter(isAudioFile);
+      let tracks: AudioTrack[] = [];
+      let kind: "audio" | "playlist" = "audio";
+      let sourceFile: File | null = null;
+
+      revokeActiveUrls();
+
+      if (playlistFile) {
+        kind = "playlist";
+        sourceFile = playlistFile;
+        const content = await playlistFile.text();
+        tracks = parseM3U(content, audioFiles);
+      } else if (audioFiles.length) {
+        sourceFile = audioFiles[0] ?? null;
+        tracks = audioFiles.map((file, index) => buildTrackFromAudioFile(file, index));
+      }
+
+      const firstTrack = tracks[0];
+      if (!sourceFile || !firstTrack) {
+        this.events.emit("error", {
+          error: new Error(strings.errors.noPlayableTracksDropped),
+        });
+        return;
+      }
+
+      this.setPlaylist(tracks, 0);
+      onDropCallback?.({ file: sourceFile, track: firstTrack, tracks, kind });
+      await this.play(0);
+    };
+
+    const onDrop = (event: DragEvent): void => {
+      void onDropEvent(event);
+    };
+
+    target.addEventListener("dragenter", onDragEnter);
+    target.addEventListener("dragover", onDragOver);
+    target.addEventListener("dragleave", onDragLeave);
+    target.addEventListener("drop", onDrop);
+
+    return () => {
+      clearActiveState();
+      target.removeEventListener("dragenter", onDragEnter);
+      target.removeEventListener("dragover", onDragOver);
+      target.removeEventListener("dragleave", onDragLeave);
+      target.removeEventListener("drop", onDrop);
+      revokeActiveUrls();
+    };
+  }
+
   async play(index?: number): Promise<void> {
     if (typeof index === "number") {
       this.loadTrackByIndex(index);
     }
 
     if (!this.audio.src) {
-      throw new Error("No track loaded. Use playlist option, setPlaylist(), or loadTrack().");
+      throw new Error(strings.errors.noTrackLoaded);
     }
 
     if (this.context.state === "suspended") {
@@ -858,7 +1130,10 @@ export class SmoothPlayer {
       playlistTitle: playlist?.title ?? DEFAULT_PLAYLIST_TITLE,
       playlistCount: this.playlists.length,
       visualizer: this.visualizerMode,
+      spectrumStyle: { ...this.spectrumStyle },
+      waveformStyle: { ...this.waveformStyle },
       accentColor: this.accentColor,
+      backgroundColor: this.backgroundColor,
       shuffle: this.shuffleEnabled,
     };
   }
@@ -910,12 +1185,36 @@ export class SmoothPlayer {
     return this.visualizerMode;
   }
 
+  setSpectrumStyle(options: Partial<SpectrumStyleOptions>): void {
+    this.spectrumStyle = { ...this.spectrumStyle, ...options };
+  }
+
+  getSpectrumStyle(): SpectrumStyleOptions {
+    return { ...this.spectrumStyle };
+  }
+
+  setWaveformStyle(options: Partial<WaveformStyleOptions>): void {
+    this.waveformStyle = { ...this.waveformStyle, ...options };
+  }
+
+  getWaveformStyle(): WaveformStyleOptions {
+    return { ...this.waveformStyle };
+  }
+
   configureAnalyzer(options: AnalyzerOptions = {}): void {
     const config = { ...DEFAULT_ANALYZER, ...options };
     this.analyser.fftSize = config.fftSize;
     this.analyser.smoothingTimeConstant = config.smoothingTimeConstant;
     this.analyser.minDecibels = config.minDecibels;
     this.analyser.maxDecibels = config.maxDecibels;
+  }
+
+  private buildSurfaceGradient(baseColor: string): string {
+    return `linear-gradient(145deg, color-mix(in srgb, ${baseColor} 74%, #2a3f67 26%), color-mix(in srgb, ${baseColor} 82%, #15233e 18%) 56%, color-mix(in srgb, ${baseColor} 88%, #0a1324 12%))`;
+  }
+
+  private buildPanelGradient(baseColor: string): string {
+    return `linear-gradient(190deg, color-mix(in srgb, ${baseColor} 72%, #2a4069 28%) 0%, color-mix(in srgb, ${baseColor} 82%, #16243f 18%) 58%, color-mix(in srgb, ${baseColor} 88%, #0a1222 12%) 100%)`;
   }
 
   private getActivePlaylist(): ResolvedPlaylist | null {
@@ -972,10 +1271,29 @@ export class SmoothPlayer {
       this.events.emit("ended", undefined);
     });
     this.audio.addEventListener("error", () => {
+      const src = this.audio.currentSrc || this.audio.src || "";
+      const mediaError = this.audio.error;
+      const isCrossOrigin = this.isCrossOriginSource(src);
+      const isPossiblyCors = isCrossOrigin && mediaError?.code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED;
+      const message = isPossiblyCors
+        ? strings.errors.corsBlocked
+        : strings.errors.audioPlaybackFailed;
       this.events.emit("error", {
-        error: new Error("Audio playback failed."),
+        error: new Error(message),
       });
     });
+  }
+
+  private isCrossOriginSource(src: string): boolean {
+    if (!src) return false;
+    if (src.startsWith("blob:") || src.startsWith("data:") || src.startsWith("file:")) return false;
+
+    try {
+      const url = new URL(src, window.location.href);
+      return url.origin !== window.location.origin;
+    } catch {
+      return false;
+    }
   }
 
   private clamp(value: number): number {

@@ -1,5 +1,17 @@
 export type VisualizerMode = "spectrum" | "waveform" | "none";
 
+export interface SpectrumStyleOptions {
+  dualLayer: boolean;
+  inverted: boolean;
+  barWidth: "thin" | "medium" | "large";
+}
+
+export interface WaveformStyleOptions {
+  doubleLine: boolean;
+  fill: boolean;
+  thickLine: boolean;
+}
+
 export interface TrackMetadata {
   title?: string;
   artist?: string;
@@ -102,6 +114,11 @@ export interface PlaylistPanelController {
   setOpen: (open: boolean) => void;
 }
 
+export interface AudioDropMountOptions {
+  activeClassName?: string;
+  onDrop?: (payload: { file: File; track: AudioTrack; tracks: AudioTrack[]; kind: "audio" | "playlist" }) => void;
+}
+
 export interface DebugPanelMountOptions {
   enabled?: boolean;
   panel: HTMLElement;
@@ -117,6 +134,12 @@ export interface DebugPanelMountOptions {
 
 export interface StandardPlayerUIMountOptions {
   debugEnabled?: boolean;
+  enableAudioDrop?: boolean;
+  enableErrorNotice?: boolean;
+  showLogo?: boolean;
+  persistUserPreferences?: boolean;
+  userPreferencesCookieName?: string;
+  userPreferencesMaxAgeDays?: number;
 }
 
 export interface StandardPlayerUIController {
@@ -134,8 +157,11 @@ export interface SmoothPlayerOptions {
   initialVolume?: number;
   initialTrackIndex?: number;
   accentColor?: string;
+  backgroundColor?: string;
   analyzer?: AnalyzerOptions;
   visualizer?: VisualizerMode;
+  spectrumStyle?: Partial<SpectrumStyleOptions>;
+  waveformStyle?: Partial<WaveformStyleOptions>;
   initialShuffle?: boolean;
   durationFallback?: boolean;
 }
@@ -151,7 +177,10 @@ export interface PlaybackState {
   playlistTitle: string;
   playlistCount: number;
   visualizer: VisualizerMode;
+  spectrumStyle: SpectrumStyleOptions;
+  waveformStyle: WaveformStyleOptions;
   accentColor: string;
+  backgroundColor: string;
   shuffle: boolean;
 }
 
