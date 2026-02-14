@@ -29,7 +29,36 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish
-        run: npm publish --provenance --access public
+      - name: Publish packages
+        run: |
+          set -euo pipefail
+
+          publish_if_needed() {
+            local pkg_name="$1"
+            local pkg_version="$2"
+            local workspace="$3"
+
+            if npm view "${pkg_name}@${pkg_version}" version >/dev/null 2>&1; then
+              echo "Skipping ${pkg_name}@${pkg_version} (already published)"
+              return
+            fi
+
+            echo "Publishing ${pkg_name}@${pkg_version}"
+            if [ "${workspace}" = "root" ]; then
+              npm publish --provenance --access public
+            else
+              npm publish -w "${workspace}" --provenance --access public
+            fi
+          }
+
+          ROOT_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version")
+          REACT_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('packages/react/package.json', 'utf8')).version")
+          VUE_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('packages/vue/package.json', 'utf8')).version")
+          SVELTE_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('packages/svelte/package.json', 'utf8')).version")
+
+          publish_if_needed "smooth-player" "${ROOT_VERSION}" "root"
+          publish_if_needed "@smooth-player/react" "${REACT_VERSION}" "@smooth-player/react"
+          publish_if_needed "@smooth-player/vue" "${VUE_VERSION}" "@smooth-player/vue"
+          publish_if_needed "@smooth-player/svelte" "${SVELTE_VERSION}" "@smooth-player/svelte"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
