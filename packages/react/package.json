@@ -3,6 +3,10 @@
   "version": "2.1.0",
   "description": "React component for Smooth Player",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marlenesco/smooth-player"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
