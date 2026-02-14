@@ -123,8 +123,10 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`Demo server running at http://${host}:${port}`);
-  console.log("Open /examples/demo.html");
+  const baseUrl = `http://${host}:${port}`;
+  console.log(`Demo server running at ${baseUrl}`);
+  console.log(`Demo page: ${baseUrl}/examples/demo.html`);
+  console.log(`Demo page (debug): ${baseUrl}/examples/demo.html?debug=1`);
 });
 
 server.on("error", (error) => {
