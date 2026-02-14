@@ -39,6 +39,10 @@
 
 }
 
+.smooth-player [hidden] {
+  display: none !important;
+}
+
 .smooth-player.is-drag-over {
   border-color: color-mix(in srgb, var(--smooth-player-accent) 44%, #fff 56%);
   box-shadow: 0 0 0 sp-rem(2) color-mix(in srgb, var(--smooth-player-accent) 18%, transparent);
