@@ -1,5 +1,7 @@
 export { SmoothPlayer } from "./SmoothPlayer.js";
-export { mountStandardPlayerUI } from "./ui.js";
+export { mountPlayerUI } from "./ui.js";
+export { strings } from "./i18n/strings.js";
+export type { SmoothPlayerStrings } from "./i18n/strings.js";
 export {
   CanvasRadialVisualizer,
   CanvasSpectrumVisualizer,
@@ -10,6 +12,7 @@ export {
 } from "./visualizers.js";
 export type {
   AnalyzerOptions,
+  AudioDropMountOptions,
   AudioPlaylist,
   AudioTrack,
   PlaybackState,
@@ -28,7 +31,9 @@ export type {
   TransportControlsMountOptions,
   StandardPlayerUIController,
   StandardPlayerUIMountOptions,
+  SpectrumStyleOptions,
   TrackInfoMountOptions,
   TrackMetadata,
   VisualizerMode,
+  WaveformStyleOptions,
 } from "./types.js";

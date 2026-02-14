@@ -26,14 +26,15 @@
     "assets"
   ],
   "scripts": {
+    "i18n:sync": "node scripts/sync-i18n.mjs",
     "clean": "rm -rf dist dist-cjs",
     "build:esm": "tsc -p tsconfig.build.esm.json",
     "build:cjs": "tsc -p tsconfig.build.cjs.json",
     "build:types": "tsc -p tsconfig.build.json",
     "build:css": "sass --no-source-map styles/index.scss dist/smooth-player.css",
-    "build": "npm run clean && npm run build:esm && npm run build:cjs && npm run build:types && npm run build:css",
+    "build": "npm run i18n:sync && npm run clean && npm run build:esm && npm run build:cjs && npm run build:types && npm run build:css",
     "dev": "tsc -p tsconfig.build.esm.json --watch",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "npm run i18n:sync && tsc --noEmit",
     "demo": "npm run build && node scripts/demo-server.mjs",
     "workspaces:build": "npm run -ws --if-present build",
     "workspaces:typecheck": "npm run -ws --if-present typecheck",
