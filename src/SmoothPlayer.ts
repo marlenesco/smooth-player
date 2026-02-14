@@ -576,6 +576,7 @@ export class SmoothPlayer {
         toggleButton.focus();
       }
       root.classList.toggle(openClassName, open);
+      panel.classList.toggle("is-open", open);
       panel.setAttribute("aria-hidden", String(!open));
       if (open) {
         panel.removeAttribute("inert");

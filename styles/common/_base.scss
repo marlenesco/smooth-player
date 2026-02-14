@@ -372,6 +372,13 @@
   z-index: 3;
 }
 
+.smooth-player__playlist.is-open {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
 .smooth-player__playlist-head {
   display: flex;
   align-items: center;
