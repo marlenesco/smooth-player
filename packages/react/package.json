@@ -1,6 +1,6 @@
 {
   "name": "@smooth-player/react",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "React component for Smooth Player",
   "type": "module",
   "main": "./dist/index.js",
@@ -23,7 +23,7 @@
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18",
-    "smooth-player": "^1.0.0"
+    "smooth-player": "^2.0.0"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && mkdir -p dist/assets && cp -R src/assets/* dist/assets/",
