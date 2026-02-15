@@ -1,6 +1,6 @@
 {
   "name": "@smooth-player/svelte",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Svelte component for Smooth Player",
   "type": "module",
   "repository": {
