@@ -56,8 +56,7 @@
   }
 }
 
-.smooth-player__main::before,
-.smooth-player__main::after {
+.smooth-player__main::before {
   content: "";
   position: absolute;
   pointer-events: none;
@@ -73,28 +72,12 @@
   transform: scale(0.985);
 }
 
-.smooth-player__main::after {
-  width: sp-rem(64);
-  height: sp-rem(64);
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(0.92);
-  background: rgba(255, 255, 255, 0.78);
-  -webkit-mask: url("/assets/icons/upload.svg") center / contain no-repeat;
-  mask: url("/assets/icons/upload.svg") center / contain no-repeat;
-}
-
-.smooth-player.is-drag-over .smooth-player__main::before,
-.smooth-player.is-drag-over .smooth-player__main::after {
+.smooth-player.is-drag-over .smooth-player__main::before {
   opacity: 1;
 }
 
 .smooth-player.is-drag-over .smooth-player__main::before {
   transform: scale(1);
-}
-
-.smooth-player.is-drag-over .smooth-player__main::after {
-  transform: translate(-50%, -50%) scale(1);
 }
 
 .smooth-player__main {
@@ -103,6 +86,32 @@
   height: 100%;
   padding: sp-rem(20);
   transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1), filter 420ms ease;
+}
+
+.smooth-player__drop-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: sp-rem(64);
+  height: sp-rem(64);
+  transform: translate(-50%, -50%) scale(0.92);
+  color: rgba(255, 255, 255, 0.78);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease, transform 220ms ease;
+
+  path {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.smooth-player.is-drag-over .smooth-player__drop-icon {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .smooth-player__notice {
@@ -543,10 +552,11 @@
   width: sp-rem(18);
   height: sp-rem(18);
   color: rgba(243, 245, 249, 0.52);
-  background: currentColor;
   display: block;
-  -webkit-mask: url("/assets/icons/note.svg") center / sp-rem(15) sp-rem(15) no-repeat;
-  mask: url("/assets/icons/note.svg") center / sp-rem(15) sp-rem(15) no-repeat;
+
+  path {
+    fill: currentColor;
+  }
 }
 
 .smooth-player__playlist-content {

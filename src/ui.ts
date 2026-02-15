@@ -19,6 +19,88 @@ type StoredUserPreferences = {
   shuffle?: boolean;
 };
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+type IconName = "shuffle" | "playPause" | "prev" | "menu" | "next" | "visualizer" | "stop" | "logo" | "upload";
+
+function iconInnerMarkup(name: IconName): string {
+  switch (name) {
+    case "shuffle":
+      return `
+        <path d="M16 5H20V9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+        <path d="M4 7H9L15 17H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+        <path d="M20 15V19H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+        <path d="M4 17H9L10.5 14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+        <path d="M13.5 9.5L15 7H20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      `;
+    case "playPause":
+      return `
+        <path class="smooth-player__icon-play-shape" d="M8 6.75C8 6.14 8.67 5.77 9.18 6.12L17.12 11.37C17.58 11.68 17.58 12.32 17.12 12.63L9.18 17.88C8.67 18.23 8 17.86 8 17.25V6.75Z"></path>
+        <rect class="smooth-player__icon-pause-shape" x="7" y="6" width="3.6" height="12" rx="1.8"></rect>
+        <rect class="smooth-player__icon-pause-shape" x="13.4" y="6" width="3.6" height="12" rx="1.8"></rect>
+      `;
+    case "prev":
+      return `
+        <path d="M6.5 6V18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" fill="none"></path>
+        <path d="M16.7 6.7C17.26 6.34 18 6.74 18 7.41V16.59C18 17.26 17.26 17.66 16.7 17.3L10.15 13.09C9.65 12.77 9.65 11.23 10.15 10.91L16.7 6.7Z" fill="currentColor"></path>
+      `;
+    case "menu":
+      return `
+        <path d="M5 7.5H19" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"></path>
+        <path d="M5 12H19" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"></path>
+        <path d="M5 16.5H19" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"></path>
+      `;
+    case "next":
+      return `
+        <path d="M17.5 6V18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" fill="none"></path>
+        <path d="M7.3 6.7C6.74 6.34 6 6.74 6 7.41V16.59C6 17.26 6.74 17.66 7.3 17.3L13.85 13.09C14.35 12.77 14.35 11.23 13.85 10.91L7.3 6.7Z" fill="currentColor"></path>
+      `;
+    case "visualizer":
+      return `
+        <path d="M4 14V10" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"></path>
+        <path d="M8 17V7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"></path>
+        <path d="M12 15V9" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"></path>
+        <path d="M16 19V5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"></path>
+        <path d="M20 13V11" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" fill="none"></path>
+      `;
+    case "stop":
+      return `<rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor"></rect>`;
+    case "logo":
+      return `
+        <path d="M413.16,490.25c-57.26-21.12-103.19-70.69-126.86-127.41-11.89-27.4-19.05-56.99-25.69-85.52-2.08-8.77-4.14-17.52-6.59-26.22-3.13-10.29-6.52-24.33-15.95-29.79-13.13-6.64-28.03,10.64-37.54,18.38-17.69,15.88-36.21,31.98-57.01,44.46-13.51,8.56-33.41,15.43-35.37,33.35-.57,5,.27,10.58,1.95,16.42,40.81,126.49,190.52,206.15,322.7,170.08,9.61-5.13-13.86-11.13-19.44-13.68l-.19-.07Z" fill="currentColor"></path>
+        <path d="M365.89,57.43c40.66,33.34,67.71,80.89,81.89,131.02,6.63,22.73,11.15,46.69,17.35,69.53,2.09,7.53,4.48,15.8,7.46,22.22,11.54,25.37,30.17,8.02,44.78-5.19,17.9-16.25,36.18-32.23,56.89-44.91,14.97-9.95,34.46-15.14,37.51-33.81.75-5.1.02-10.83-1.64-16.85C571.45,57.39,436.21-17.82,306.42,3.64c-5.43,1.02-28.88,4.41-20.84,10.41,5.26,3.54,13.28,5.63,19.56,8.12,21.83,8.01,42.56,20.25,60.59,35.12l.16.13Z" fill="currentColor"></path>
+        <path d="M0,256.33c.16-2.17,2.42-3.29,4.42-4.67,4.31-2.51,9.11-4.6,13.93-6.71,24.87-10.21,57.01-25.84,77.89-49.13,44.3-48.31,66.45-112.27,140.9-121.77,68.74-8.25,124.54,43.84,146.34,105.42,22.37,52.67,19.47,160.73,85.38,177.19,48.3,8.84,82.28-45.34,117.64-71.14,16.82-13.13,35.7-23,56.52-28.47,19.86-5.57,52.31-8.41,69.25-4.55,11.81,2.68,9.57,6.94-3.92,12.92-5.19,2.41-11.94,5.22-19.53,8.62-21.23,9.29-43.05,21.6-59.76,38.27-32.53,31.3-51.43,75.95-88.23,103.12-32.42,24.86-77.3,31.49-115.31,16.15-35.32-13.64-62.84-43.07-79.55-76.74-19.72-38.62-24.46-83.52-35.94-124.85-5.57-19.35-13.14-38.79-26.57-54.02-26.91-30.22-60.79-24.68-89.72-1.85-28.45,22.05-53.78,54.65-87.58,70.86-20.88,10.66-45.96,16.01-68.93,17.21-10.29.51-35.49.73-37.21-5.8v-.07h-.02Z" fill="currentColor"></path>
+      `;
+    case "upload":
+      return `
+        <path d="M12 16V6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+        <path d="M8.5 9.5L12 6l3.5 3.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+        <path d="M6 14.5v2.1c0 1 .8 1.9 1.9 1.9h8.2c1 0 1.9-.8 1.9-1.9v-2.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+      `;
+    default:
+      return "";
+  }
+}
+
+function iconMarkup(name: IconName, className: string): string {
+  const viewBox = name === "logo" ? "0 0 719.94 512.71" : "0 0 24 24";
+  return `
+    <svg class="${className}" viewBox="${viewBox}" aria-hidden="true" focusable="false">
+      ${iconInnerMarkup(name)}
+    </svg>
+  `;
+}
+
+function createIconElement(doc: Document, name: IconName, className: string): SVGSVGElement {
+  const svg = doc.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("class", className);
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("focusable", "false");
+  svg.setAttribute("viewBox", name === "logo" ? "0 0 719.94 512.71" : "0 0 24 24");
+  svg.innerHTML = iconInnerMarkup(name);
+  return svg;
+}
+
 function requiredElement<T extends Element>(scope: ParentNode, selector: string): T {
   const element = scope.querySelector(selector);
   if (!element) {
@@ -34,7 +116,7 @@ function renderPlayerMarkup(root: HTMLElement, debugEnabled: boolean): void {
       <div class="smooth-player__top">
         <div class="smooth-player__top-title"></div>
         <button id="shuffle-toggle" type="button" aria-label="${strings.shuffle.disabledLabel}" aria-pressed="false" hidden>
-          <span class="smooth-player__icon-shuffle" aria-hidden="true"></span>
+          ${iconMarkup("shuffle", "smooth-player__icon-shuffle")}
           <span id="shuffle-text" class="smooth-player__sr-only">${strings.shuffle.disabledLabel}</span>
         </button>
       </div>
@@ -48,7 +130,7 @@ function renderPlayerMarkup(root: HTMLElement, debugEnabled: boolean): void {
           </div>
         </div>
         <button id="play" class="smooth-player__hero-play" type="button" aria-label="${strings.playback.playLabel}" aria-pressed="false">
-          <span id="play-icon" class="smooth-player__icon-play" aria-hidden="true"></span>
+          ${iconMarkup("playPause", "smooth-player__icon-play")}
           <span id="play-text" class="smooth-player__sr-only">${strings.playback.playLabel}</span>
         </button>
       </div>
@@ -68,18 +150,19 @@ function renderPlayerMarkup(root: HTMLElement, debugEnabled: boolean): void {
 
       <div class="smooth-player__transport">
         <button id="prev" class="secondary" type="button" aria-label="Previous track">
-          <img class="smooth-player__icon" src="/assets/icons/prev.svg" alt="" />
+          ${iconMarkup("prev", "smooth-player__icon smooth-player__icon--prev")}
           <span class="smooth-player__sr-only">Previous track</span>
         </button>
         <button id="playlist-toggle" class="secondary smooth-player__transport-playlist" type="button" aria-label="${strings.playlist.openLabel}" aria-expanded="false" hidden>
-          <img class="smooth-player__icon" src="/assets/icons/menu.svg" alt="" />
+          ${iconMarkup("menu", "smooth-player__icon smooth-player__icon--menu")}
           <span class="smooth-player__sr-only">${strings.playlist.openLabel}</span>
         </button>
         <button id="next" class="secondary" type="button" aria-label="Next track">
-          <img class="smooth-player__icon" src="/assets/icons/next.svg" alt="" />
+          ${iconMarkup("next", "smooth-player__icon smooth-player__icon--next")}
           <span class="smooth-player__sr-only">Next track</span>
         </button>
       </div>
+      ${iconMarkup("upload", "smooth-player__drop-icon")}
     </div>
 
     <aside id="playlist-panel" class="smooth-player__playlist" aria-hidden="true">
@@ -156,7 +239,7 @@ export function mountPlayerUI(
   const unmounts: Array<() => void> = [];
   let radial: CanvasRadialVisualizer | null = null;
   let noticeTimer: ReturnType<typeof setTimeout> | null = null;
-  let brandLogo: HTMLElement | null = null;
+  let brandLogo: Element | null = null;
   let visualizerPanelOpen = false;
 
   const parsePreferencesCookie = (): StoredUserPreferences | null => {
@@ -232,9 +315,7 @@ export function mountPlayerUI(
   applyStoredPreferences();
 
   if (showLogo && top instanceof HTMLElement && !top.querySelector(".smooth-player__brand")) {
-    brandLogo = doc.createElement("span");
-    brandLogo.className = "smooth-player__brand";
-    brandLogo.setAttribute("aria-hidden", "true");
+    brandLogo = createIconElement(doc, "logo", "smooth-player__brand");
     top.insertAdjacentElement("afterbegin", brandLogo);
   }
 
@@ -242,9 +323,7 @@ export function mountPlayerUI(
   visualizerToggle.id = "visualizer-toggle";
   visualizerToggle.type = "button";
   visualizerToggle.className = "secondary";
-  const visualizerIcon = doc.createElement("span");
-  visualizerIcon.className = "smooth-player__icon-visualizer";
-  visualizerIcon.setAttribute("aria-hidden", "true");
+  const visualizerIcon = createIconElement(doc, "visualizer", "smooth-player__icon-visualizer");
   const visualizerText = doc.createElement("span");
   visualizerText.className = "smooth-player__sr-only";
   visualizerToggle.append(visualizerIcon, visualizerText);
@@ -254,9 +333,7 @@ export function mountPlayerUI(
   stopButton.type = "button";
   stopButton.className = "secondary";
   stopButton.setAttribute("aria-label", strings.playback.stopLabel);
-  const stopIcon = doc.createElement("span");
-  stopIcon.className = "smooth-player__icon-stop";
-  stopIcon.setAttribute("aria-hidden", "true");
+  const stopIcon = createIconElement(doc, "stop", "smooth-player__icon-stop");
   const stopText = doc.createElement("span");
   stopText.className = "smooth-player__sr-only";
   stopText.textContent = strings.playback.stopLabel;

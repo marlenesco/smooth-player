@@ -42,6 +42,7 @@ const DEFAULT_ACCENT_COLOR = "#0ed2a4";
 const DEFAULT_BACKGROUND_COLOR = "#0b1220";
 const DEFAULT_PLAYLIST_ID = strings.playlist.defaultId;
 const DEFAULT_PLAYLIST_TITLE = strings.playlist.defaultTitle;
+const SVG_NS = "http://www.w3.org/2000/svg";
 const DEFAULT_SPECTRUM_STYLE: SpectrumStyleOptions = {
   dualLayer: false,
   inverted: false,
@@ -291,9 +292,13 @@ export class SmoothPlayer {
         entry.setAttribute("tabindex", "0");
         entry.setAttribute(settings.selectedAriaAttr, String(index === this.currentTrackIndex));
 
-        const icon = document.createElement("span");
-        icon.className = "smooth-player__playlist-note";
+        const icon = document.createElementNS(SVG_NS, "svg");
+        icon.setAttribute("class", "smooth-player__playlist-note");
         icon.setAttribute("aria-hidden", "true");
+        icon.setAttribute("focusable", "false");
+        icon.setAttribute("viewBox", "0 0 24 24");
+        icon.innerHTML =
+          '<path d="M14 4.8V14.2C13.3 13.8 12.4 13.6 11.4 13.6C9.1 13.6 7.2 14.8 7.2 16.5C7.2 18.2 9.1 19.4 11.4 19.4C13.7 19.4 15.6 18.2 15.6 16.5V8.6L20 7.4V13.2C19.3 12.8 18.4 12.6 17.4 12.6C15.1 12.6 13.2 13.8 13.2 15.5C13.2 17.2 15.1 18.4 17.4 18.4C19.7 18.4 21.6 17.2 21.6 15.5V4L14 4.8Z"></path>';
 
         const content = document.createElement("span");
         content.className = "smooth-player__playlist-content";
