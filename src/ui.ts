@@ -32,7 +32,7 @@ function renderPlayerMarkup(root: HTMLElement, debugEnabled: boolean): void {
   root.innerHTML = `
     <div class="smooth-player__main">
       <div class="smooth-player__top">
-        <div class="smooth-player__top-title">${strings.playlist.defaultTitle}</div>
+        <div class="smooth-player__top-title"></div>
         <button id="shuffle-toggle" type="button" aria-label="${strings.shuffle.disabledLabel}" aria-pressed="false" hidden>
           <span class="smooth-player__icon-shuffle" aria-hidden="true"></span>
           <span id="shuffle-text" class="smooth-player__sr-only">${strings.shuffle.disabledLabel}</span>
@@ -463,8 +463,10 @@ export function mountPlayerUI(
   };
 
   const renderTopPlaylist = (): void => {
+    const hasPlaylist = player.getPlaylists().length > 1 || player.getPlaylist().length > 1;
+    playlistTop.hidden = !hasPlaylist;
     const playlist = player.getCurrentPlaylist();
-    playlistTitle.textContent = playlist?.title ?? strings.playlist.defaultTitle;
+    playlistTitle.textContent = hasPlaylist ? (playlist?.title ?? strings.playlist.defaultTitle) : "";
   };
 
   const renderVisualizerPanel = (): void => {
@@ -609,7 +611,6 @@ export function mountPlayerUI(
     closeButton: playlistClose,
   });
   unmounts.push(() => playlistPanelController.destroy());
-  unmounts.push(player.mountPlaylistTitle(playlistTitle));
 
   unmounts.push(player.mountShuffleToggle({
     button: shuffleToggle,

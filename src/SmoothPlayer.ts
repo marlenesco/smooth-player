@@ -427,8 +427,10 @@ export class SmoothPlayer {
     const fallbackTitle = options.fallbackTitle ?? DEFAULT_PLAYLIST_TITLE;
 
     const render = (): void => {
+      const hasPlaylist = this.getPlaylists().length > 1 || this.getActiveTracks().length > 1;
       const playlist = this.getCurrentPlaylist();
-      element.textContent = playlist?.title ?? fallbackTitle;
+      element.hidden = !hasPlaylist;
+      element.textContent = hasPlaylist ? (playlist?.title ?? fallbackTitle) : "";
     };
 
     render();
