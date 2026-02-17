@@ -44,7 +44,7 @@ const tracks = [
 const player = new SmoothPlayer({
   playlist: tracks,
   initialVolume: 0.8,
-  visualizer: "spectrum",
+  visualizer: "spectrum", // Can be "spectrum", "waveform", or "none"
   accentColor: "#0ed2a4",
   backgroundColor: "#0b1220",
   debug: false,
@@ -72,6 +72,42 @@ mountPlayerUI(player, root);
 - `loop?: boolean`
 - `durationFallback?: boolean` (default: `true`, fallback decode for unknown metadata duration)
 - `analyzer?: { fftSize, smoothingTimeConstant, minDecibels, maxDecibels }`
+
+Default config reference:
+
+```ts
+const player = new SmoothPlayer({
+  audio: new Audio(), // Default internal audio element when omitted
+  autoplay: false,
+  loop: false,
+  debug: false,
+  crossOrigin: "anonymous",
+  playlist: undefined, // No initial playlist
+  initialVolume: 1,
+  initialTrackIndex: 0, // Falls back to -1 when no playlist is provided
+  accentColor: "#0ed2a4",
+  backgroundColor: "#0b1220",
+  visualizer: "spectrum", // Can be "spectrum", "waveform", or "none"
+  spectrumStyle: {
+    dualLayer: false,
+    inverted: false,
+    barWidth: "medium",
+  },
+  waveformStyle: {
+    doubleLine: false,
+    fill: false,
+    thickLine: false,
+  },
+  initialShuffle: false,
+  durationFallback: true,
+  analyzer: {
+    fftSize: 2048,
+    smoothingTimeConstant: 0.8,
+    minDecibels: -90,
+    maxDecibels: -10,
+  },
+});
+```
 
 ## Visualizer
 
@@ -237,6 +273,22 @@ State and utility:
 - `enableErrorNotice?: boolean` (default: `true`)
 - `showLogo?: boolean` (default: `true`)
 - `persistUserPreferences?: boolean` (default: `true`)
+- `userPreferencesCookieName?: string` (default: `"smooth_player_prefs"`)
+- `userPreferencesMaxAgeDays?: number` (default: `365`, minimum effective value: `1`)
+
+Default UI config reference:
+
+```ts
+mountPlayerUI(player, root, {
+  debugEnabled: player.getDebug(),
+  enableAudioDrop: true,
+  enableErrorNotice: true,
+  showLogo: true,
+  persistUserPreferences: true,
+  userPreferencesCookieName: "smooth_player_prefs",
+  userPreferencesMaxAgeDays: 365, // Minimum effective value is 1 day
+});
+```
 
 When preference persistence is enabled, user choices can override initial UI configuration on next sessions.
 
