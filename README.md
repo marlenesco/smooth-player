@@ -20,6 +20,12 @@ Smooth Player is a TypeScript audio player for the web with built-in playlist ha
 npm install smooth-player
 ```
 
+Smooth Player can also be integrated into framework-based applications through dedicated wrappers. If you are using a specific framework, start from one of these guides:
+
+- [React](./packages/react/README.md)
+- [Vue](./packages/vue/README.md)
+- [Svelte](./packages/svelte/README.md)
+
 ![Smooth Player screenshot](examples/screenshot/example.png)
 
 ## Quick Start
